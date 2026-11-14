@@ -1,0 +1,23 @@
+{
+    "target_column": "isFraud",
+    "source_dataset": "upi_fraud_detection_dataset.csv",
+    "feature_columns": [
+        "step",
+        "amount",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "oldbalanceDest",
+        "newbalanceDest",
+        "type_CASH_IN",
+        "type_CASH_OUT",
+        "type_DEBIT",
+        "type_PAYMENT",
+        "type_TRANSFER"
+    ],
+    "split_method": "chronological_by_step",
+    "train_end_step": 323,
+    "validation_end_step": 377,
+    "train_rows": 4463587,
+    "validation_rows": 943289,
+    "test_rows": 955744
+}

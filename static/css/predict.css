@@ -1,0 +1,201 @@
+
+/* ========================================
+   SECUREPAY - TRANSACTION PREDICTION PAGE
+======================================== */
+
+.predict-page {
+    width: min(1180px, 92%);
+    margin: 0 auto;
+    padding: 42px 0 64px;
+    color: #202344;
+}
+
+.predict-page .page-heading {
+    margin-bottom: 28px;
+}
+
+.predict-page .eyebrow {
+    margin-bottom: 10px;
+    color: #6542d8;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.8px;
+}
+
+.predict-page .page-heading h1 {
+    margin: 0 0 12px;
+    color: #202344;
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.predict-page .page-heading > p:last-child {
+    color: #74768d;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.predict-card {
+    padding: 32px;
+    border: 1px solid #e8e7f3;
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: 0 12px 35px rgba(36, 35, 83, 0.07);
+}
+
+.predict-card form {
+    width: 100%;
+}
+
+.predict-card .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.predict-card .form-group {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.predict-card .form-group label {
+    color: #343451;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.predict-card .form-group input,
+.predict-card .form-group select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid #dedfee;
+    border-radius: 9px;
+    outline: none;
+    background: #fbfbff;
+    color: #292944;
+    font: inherit;
+    font-size: 13px;
+    transition: border-color 0.2s, box-shadow 0.2s,
+                background 0.2s;
+}
+
+.predict-card .form-group input::placeholder {
+    color: #a0a1b4;
+}
+
+.predict-card .form-group input:focus,
+.predict-card .form-group select:focus {
+    border-color: #7552e5;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(117, 82, 229, 0.12);
+}
+
+.predict-card .form-group small {
+    color: #85869a;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.predict-button {
+    display: inline-flex;
+    min-height: 49px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 28px;
+    padding: 13px 25px;
+    border: 0;
+    border-radius: 10px;
+    background: linear-gradient(110deg, #4938d6, #7952ed);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 7px 18px rgba(83, 62, 208, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.predict-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(83, 62, 208, 0.28);
+}
+
+.predict-button:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+.prediction-result {
+    margin-top: 26px;
+    padding: 27px;
+    border: 1px solid #dcd6fb;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ffffff, #f7f5ff);
+    box-shadow: 0 8px 25px rgba(36, 35, 83, 0.06);
+}
+
+.prediction-result h2 {
+    margin: 0 0 15px;
+    color: #282447;
+    font-size: 22px;
+}
+
+.prediction-result p {
+    margin: 10px 0;
+    color: #62637d;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.prediction-result .result-status {
+    color: #6542d8;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.prediction-result .result-disclaimer {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid #e8e4f7;
+    color: #85849a;
+    font-size: 11px;
+}
+
+@media (max-width: 650px) {
+    .predict-page {
+        width: 94%;
+        padding-top: 28px;
+    }
+
+    .predict-card {
+        padding: 21px;
+        border-radius: 15px;
+    }
+
+    .predict-card .form-grid {
+        grid-template-columns: 1fr;
+        gap: 19px;
+    }
+
+    .predict-button {
+        width: 100%;
+    }
+
+    .prediction-result {
+        padding: 21px;
+    }
+}
+
+
+/* Remove unwanted line below the analysis result */
+.analysis-result,
+.analysis-result-card,
+.result-card {
+    border-bottom: none !important;
+    box-shadow: none !important;
+}

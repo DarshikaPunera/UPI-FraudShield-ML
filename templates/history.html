@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Transaction History | SecurePay{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="history-page">
+
+    <div class="page-heading">
+        <p class="eyebrow">SECUREPAY INTELLIGENCE</p>
+        <h1>Transaction History</h1>
+        <p>Review transactions analyzed by the fraud detection model.</p>
+    </div>
+
+    <div class="history-summary">
+
+        <div class="summary-card">
+            <span>Total Transactions</span>
+            <strong>{{ transactions|length }}</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>Potential Fraud</span>
+            <strong>{{ fraud_count|default(0) }}</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>Likely Genuine</span>
+            <strong>{{ legitimate_count|default(0) }}</strong>
+        </div>
+
+    </div>
+
+    <div class="history-card">
+
+        <div class="history-toolbar">
+
+            <div class="form-group">
+                <label for="historySearch">Search Transactions</label>
+                <input
+                    type="search"
+                    id="historySearch"
+                    placeholder="Search by transaction ID or type"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="historyFilter">Filter by Result</label>
+
+                <select id="historyFilter">
+                    <option value="all">All Transactions</option>
+                    <option value="fraud">Potential Fraud</option>
+                    <option value="genuine">Likely Genuine</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="history-table">
+
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Amount</th>
+                        <th>Type</th>
+                        <th>Fraud Probability</th>
+                        <th>Result</th>
+                        <th>Date</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+
+                <tbody id="historyTableBody">
+
+                    {% for transaction in transactions %}
+
+                    {% set tx_result = transaction.prediction|default(transaction.result|default('Likely Genuine')) %}
+                    {% set tx_type = transaction.transaction_type|default(transaction.type|default('N/A')) %}
+                    {% set tx_id = transaction.id|default(transaction.transaction_id|default('N/A')) %}
+                    {% set tx_probability = transaction.fraud_probability|default(transaction.risk_score|default(transaction.probability|default(0))) %}
+
+                    <tr
+                        data-transaction-row
+                        data-prediction="{{ 'fraud' if 'fraud' in tx_result|string|lower or 'potential' in tx_result|string|lower else 'genuine' }}"
+                    >
+
+                        
+                    <td>#{{ tx_id }}</td>
+
+                        <td>
+                            ₹{{ "%.2f"|format(transaction.amount|default(0)|float) }}
+                        </td>
+
+                        <td>{{ tx_type }}</td>
+
+                        <td>
+                            {% if tx_probability|float <= 1 %}
+                                {{ "%.2f"|format(tx_probability|float * 100) }}%
+                            {% else %}
+                                {{ "%.2f"|format(tx_probability|float) }}%
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="status-badge {{ 'status-fraud' if 'fraud' in tx_result|string|lower or 'potential' in tx_result|string|lower else 'status-genuine' }}">
+                                {{ tx_result }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ transaction.created_at|default(transaction.timestamp|default('N/A')) }}
+                        </td>
+
+                        <td>
+                            <a
+                                href="{{ url_for('transaction_details_page', transaction_id=tx_id) }}"
+                                class="details-link"
+                            >
+                                View
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            No transactions found. Analyze a transaction to see it here.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <p id="historyEmpty" class="empty-state" hidden>
+            No transactions match your search or filter.
+        </p>
+
+    </div>
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/history.js') }}"></script>
+{% endblock %}

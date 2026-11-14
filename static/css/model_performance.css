@@ -1,0 +1,251 @@
+
+/* SecurePay - Model Performance Page */
+
+.model-performance-page {
+    width: 100%;
+    max-width: 1240px;
+    min-height: 80vh;
+    margin: 0 auto;
+    padding: 42px 28px 60px;
+    color: #192239;
+    box-sizing: border-box;
+}
+
+.model-performance-page *,
+.model-performance-page *::before,
+.model-performance-page *::after {
+    box-sizing: border-box;
+}
+
+.model-performance-page .page-heading {
+    margin-bottom: 28px;
+}
+
+.model-performance-page .eyebrow {
+    margin: 0 0 9px;
+    color: #6559df;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.model-performance-page .page-heading h1 {
+    margin: 0 0 10px;
+    color: #192239;
+    font-size: clamp(28px, 3vw, 36px);
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.model-performance-page .page-heading > p:last-child {
+    margin: 0;
+    color: #7c879c;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+/* Model information */
+
+.model-performance-page .model-info-card {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    padding: 25px;
+    margin-bottom: 24px;
+    border: 1px solid #e8e9f3;
+    border-radius: 16px;
+    background: linear-gradient(120deg, #ffffff, #f7f6ff);
+    box-shadow: 0 6px 24px rgba(30, 40, 75, 0.05);
+}
+
+.model-performance-page .details-label {
+    display: block;
+    margin-bottom: 10px;
+    color: #7c879c;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.model-performance-page .model-info-card h2 {
+    margin: 0;
+    color: #5e52d5;
+    font-size: 23px;
+    font-weight: 800;
+}
+
+.model-performance-page .model-info-card > div > p {
+    margin: 0;
+    color: #303b53;
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.model-performance-page .model-info-card > div > strong {
+    color: #303b53;
+    font-size: 19px;
+}
+
+/* Performance metric cards */
+
+.model-performance-page .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.model-performance-page .metric-card {
+    position: relative;
+    min-width: 0;
+    padding: 23px;
+    overflow: hidden;
+    border: 1px solid #e9ebf3;
+    border-radius: 15px;
+    background: #ffffff;
+    box-shadow: 0 5px 20px rgba(29, 39, 73, 0.045);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.model-performance-page .metric-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px rgba(29, 39, 73, 0.09);
+}
+
+.model-performance-page .metric-card span {
+    display: block;
+    margin-bottom: 17px;
+    color: #7c879c;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.model-performance-page .metric-card strong {
+    display: block;
+    color: #202940;
+    font-size: clamp(25px, 3vw, 32px);
+    font-weight: 800;
+    letter-spacing: -0.7px;
+    overflow-wrap: anywhere;
+}
+
+/* Dataset details */
+
+.model-performance-page .dataset-card {
+    display: block;
+    margin-bottom: 24px;
+    background: #ffffff;
+}
+
+.model-performance-page .dataset-card > h2 {
+    padding-bottom: 17px;
+    margin: 0 0 8px;
+    border-bottom: 1px solid #eceef5;
+    color: #202940;
+    font-size: 20px;
+}
+
+.model-performance-page .details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 28px;
+}
+
+.model-performance-page .detail-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 19px 0;
+    border-bottom: 1px solid #f0f1f6;
+}
+
+.model-performance-page .detail-item span {
+    color: #7c879c;
+    font-size: 13px;
+}
+
+.model-performance-page .detail-item strong {
+    color: #303b53;
+    font-size: 14px;
+    font-weight: 750;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+/* Understanding the metrics */
+
+.model-performance-page .model-note {
+    padding: 25px;
+    border: 1px solid #e6e8f5;
+    border-radius: 15px;
+    background: #f7f8ff;
+}
+
+.model-performance-page .model-note h3 {
+    margin: 0 0 18px;
+    color: #202940;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.model-performance-page .model-note p {
+    margin: 0;
+    padding: 12px 0;
+    border-bottom: 1px solid #e9ebf5;
+    color: #68748b;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.model-performance-page .model-note p strong {
+    color: #303b53;
+}
+
+.model-performance-page .model-note .result-disclaimer {
+    padding-top: 17px;
+    border-bottom: 0;
+    color: #6559b8;
+    font-size: 12px;
+}
+
+/* Responsive layout */
+
+@media (max-width: 900px) {
+    .model-performance-page .metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .model-performance-page .model-info-card {
+        gap: 20px;
+    }
+}
+
+@media (max-width: 600px) {
+    .model-performance-page {
+        padding: 28px 15px 40px;
+    }
+
+    .model-performance-page .model-info-card {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        padding: 20px;
+    }
+
+    .model-performance-page .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .model-performance-page .metric-card {
+        padding: 20px;
+    }
+
+    .model-performance-page .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .model-performance-page .model-note {
+        padding: 20px;
+    }
+}

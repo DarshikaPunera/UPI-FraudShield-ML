@@ -1,0 +1,114 @@
+
+{% extends "base.html" %}
+
+{% block title %}Transaction Details | SecurePay{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/transaction_details.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="transaction-details-page">
+    <div class="page-heading">
+        <p class="eyebrow">SECUREPAY INTELLIGENCE</p>
+        <h1>Transaction Details</h1>
+        <p>Review the transaction information and model risk assessment.</p>
+    </div>
+
+    {% if transaction %}
+    {% set tx_result = transaction.prediction|default(transaction.result|default('Unknown')) %}
+    {% set tx_probability = transaction.fraud_probability|default(transaction.risk_score|default(transaction.probability|default(0))) %}
+
+    <div class="details-card">
+        <div class="details-header">
+            <div>
+                <span class="details-label">Transaction ID</span>
+                <h2>#{{ transaction.id|default(transaction.transaction_id|default(transaction_id|default('N/A'))) }}</h2>
+            </div>
+            <span class="status-badge {{ 'status-fraud' if 'fraud' in tx_result|string|lower or 'potential' in tx_result|string|lower else 'status-genuine' }}">
+                {{ tx_result }}
+            </span>
+        </div>
+
+        <div class="details-grid">
+            <div class="detail-item">
+                <span>Transaction Amount</span>
+                <strong>₹{{ "%.2f"|format(transaction.amount|default(0)|float) }}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Transaction Type</span>
+                <strong>{{ transaction.transaction_type|default(transaction.type|default('N/A')) }}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Fraud Probability</span>
+                <strong>
+                    {% if tx_probability|float <= 1 %}
+                        {{ "%.2f"|format(tx_probability|float * 100) }}%
+                    {% else %}
+                        {{ "%.2f"|format(tx_probability|float) }}%
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Decision Threshold</span>
+                <strong>
+                    {% if transaction.threshold is defined %}
+                        {{ "%.4f"|format(transaction.threshold|float) }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Transaction Step</span>
+                <strong>{{ transaction.step|default('N/A') }}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Date and Time</span>
+                <strong>{{ transaction.created_at|default(transaction.timestamp|default('N/A')) }}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Sender's Previous Balance</span>
+                <strong>₹{{ "%.2f"|format(transaction.oldbalance_org|default(0)|float) }}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Sender's New Balance</span>
+                <strong>₹{{ "%.2f"|format(transaction.newbalance_org|default(0)|float) }}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Receiver's Previous Balance</span>
+                <strong>₹{{ "%.2f"|format(transaction.oldbalance_dest|default(0)|float) }}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Receiver's New Balance</span>
+                <strong>₹{{ "%.2f"|format(transaction.newbalance_dest|default(0)|float) }}</strong>
+            </div>
+        </div>
+
+        <p class="result-disclaimer">
+            This assessment is based on the trained machine learning model. It indicates potential risk and does not independently prove fraud.
+        </p>
+
+        <div class="details-actions">
+            <a href="{{ url_for('history_page') }}" class="secondary-button">Back to History</a>
+            <a href="{{ url_for('predict_page') }}" class="primary-button">Analyze Another Transaction</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="details-card">
+        <h2>Transaction Not Found</h2>
+        <p>The requested transaction could not be found or you may not have permission to view it.</p>
+        <a href="{{ url_for('history_page') }}" class="primary-button">Back to History</a>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

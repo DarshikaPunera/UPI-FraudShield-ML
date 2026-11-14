@@ -1,0 +1,98 @@
+
+{% extends "base.html" %}
+
+{% block title %}Model Performance | SecurePay{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/model_performance.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="model-performance-page">
+    <div class="page-heading">
+        <p class="eyebrow">MODEL INTELLIGENCE</p>
+        <h1>Model Performance</h1>
+        <p>Performance metrics of the trained machine learning model.</p>
+    </div>
+
+    <div class="model-info-card">
+        <div>
+            <span class="details-label">Algorithm</span>
+            <h2>{{ algorithm|default(model_name|default('XGBoost')) }}</h2>
+        </div>
+        <div>
+            <span class="details-label">Dataset</span>
+            <p>PaySim Synthetic Mobile-Money Dataset</p>
+        </div>
+        <div>
+            <span class="details-label">Decision Threshold</span>
+            <strong>{{ "%.4f"|format(threshold|default(0.9922698736190796)|float) }}</strong>
+        </div>
+    </div>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <span>Accuracy</span>
+            <strong>{{ "%.2f"|format(accuracy|default(0)|float * 100) }}%</strong>
+        </div>
+        <div class="metric-card">
+            <span>Precision</span>
+            <strong>{{ "%.2f"|format(precision|default(0)|float * 100) }}%</strong>
+        </div>
+        <div class="metric-card">
+            <span>Recall</span>
+            <strong>{{ "%.2f"|format(recall|default(0)|float * 100) }}%</strong>
+        </div>
+        <div class="metric-card">
+            <span>F1 Score</span>
+            <strong>{{ "%.2f"|format(f1_score|default(0)|float * 100) }}%</strong>
+        </div>
+        <div class="metric-card">
+            <span>ROC-AUC</span>
+            <strong>{{ "%.4f"|format(roc_auc|default(0)|float) }}</strong>
+        </div>
+        <div class="metric-card">
+            <span>Average Precision</span>
+            <strong>{{ "%.4f"|format(average_precision|default(0)|float) }}</strong>
+        </div>
+    </div>
+
+    <div class="model-info-card dataset-card">
+        <h2>Dataset Information</h2>
+        <div class="details-grid">
+            <div class="detail-item">
+                <span>Training Samples</span>
+                <strong>{{ "{:,}".format(training_samples|default(0)|int) }}</strong>
+            </div>
+            <div class="detail-item">
+                <span>Validation Samples</span>
+                <strong>{{ "{:,}".format(validation_samples|default(0)|int) }}</strong>
+            </div>
+            <div class="detail-item">
+                <span>Testing Samples</span>
+                <strong>{{ "{:,}".format(test_samples|default(0)|int) }}</strong>
+            </div>
+            <div class="detail-item">
+                <span>Training Time</span>
+                <strong>
+                    {% if training_time is defined %}
+                        {{ "%.2f"|format(training_time|float) }} seconds
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="model-note">
+        <h3>Understanding the Metrics</h3>
+        <p><strong>Accuracy:</strong> Overall proportion of correct predictions.</p>
+        <p><strong>Precision:</strong> How many transactions flagged as fraud were actually fraud.</p>
+        <p><strong>Recall:</strong> How many actual fraudulent transactions the model detected.</p>
+        <p><strong>F1 Score:</strong> Balance between precision and recall.</p>
+        <p><strong>ROC-AUC:</strong> Measures how well the model separates the two classes.</p>
+        <p class="result-disclaimer">Metrics describe the model's evaluation results; live predictions can differ.</p>
+    </div>
+</section>
+{% endblock %}

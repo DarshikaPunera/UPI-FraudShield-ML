@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#10112b">
+
+    <title>{% block title %}SecurePay | UPI Fraud Detection{% endblock %}</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <!-- Main CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    {% block styles %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVIGATION BAR
+    ========================== -->
+
+    <header class="site-header">
+
+        <div class="nav-container">
+
+            <a href="{{ url_for('home') }}" class="brand">
+                <span class="brand-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </span>
+
+                <span class="brand-name">
+                    Secure<span>Pay</span>
+                </span>
+            </a>
+
+            <button
+                class="mobile-menu-button"
+                id="mobileMenuButton"
+                type="button"
+                aria-label="Toggle navigation"
+                aria-expanded="false"
+            >
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <nav class="main-navigation" id="mainNavigation">
+
+                <a href="{{ url_for('home') }}">Home</a>
+
+                <a href="{{ url_for('home') }}#features">Features</a>
+
+                <a href="{{ url_for('home') }}#how-it-works">About</a>
+
+                {% if logged_in_user %}
+
+                    {% if logged_in_user.role == 'admin' %}
+
+                        <a href="{{ url_for('admin_dashboard_page') }}">
+                            Admin Dashboard
+                        </a>
+
+                    {% else %}
+
+                        <a href="{{ url_for('dashboard_page') }}">
+                            Dashboard
+                        </a>
+
+                    {% endif %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('logout_page') }}"
+                        class="nav-logout-form"
+                    >
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token }}"
+                        >
+
+                        <button type="submit" class="nav-button nav-button-outline">
+                            Sign Out
+                        </button>
+                    </form>
+
+                {% else %}
+
+                    <a
+                        href="{{ url_for('login_page') }}"
+                        class="nav-button nav-button-outline"
+                    >
+                        Log In
+                    </a>
+
+                    <a
+                        href="{{ url_for('register_page') }}"
+                        class="nav-button nav-button-primary"
+                    >
+                        Sign Up
+                    </a>
+
+                {% endif %}
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         FLASH MESSAGES
+    ========================== -->
+
+    <div class="flash-container">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div
+                        class="flash-message flash-{{ category }}"
+                        role="status"
+                    >
+                        <span>{{ message }}</span>
+
+                        <button
+                            type="button"
+                            class="flash-close"
+                            aria-label="Close message"
+                            onclick="this.parentElement.remove()"
+                        >
+                            &times;
+                        </button>
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+    </div>
+
+
+    <!-- =========================
+         MAIN PAGE CONTENT
+    ========================== -->
+
+    <main class="main-content">
+
+        {% block content %}{% endblock %}
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer class="site-footer">
+
+        <div class="footer-container">
+
+            <div class="footer-brand">
+                <i class="fa-solid fa-shield-halved"></i>
+                SecurePay
+            </div>
+
+            <p>
+                Machine Learning Based UPI Fraud Detection System
+            </p>
+
+            <p class="footer-disclaimer">
+                Educational prototype. Predictions are estimates and are
+                not connected to live banking systems.
+            </p>
+
+            <p class="footer-copyright">
+                &copy; 2026 SecurePay. Academic Project.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- Main JavaScript -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,496 @@
+
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | SecurePay{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="admin-dashboard-page">
+
+    <!-- Page Heading -->
+    <div class="admin-hero">
+        <div class="page-heading">
+            <p class="eyebrow">SECUREPAY INTELLIGENCE CENTER</p>
+            <h1>Admin Dashboard</h1>
+            <p>Monitor transaction activity, fraud risk, users, and model insights from one place.</p>
+        </div>
+        <div class="admin-live-status">
+            <span class="live-dot"></span>
+            Dashboard Active
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="admin-stats-grid">
+        <article class="admin-stat-card stat-users">
+            <div class="stat-top">
+                <span class="stat-icon">♙</span>
+                <span class="stat-label">Registered Users</span>
+            </div>
+            <strong>{{ total_users|default(0) }}</strong>
+            <p>Accounts registered in SecurePay</p>
+        </article>
+
+        <article class="admin-stat-card stat-transactions">
+            <div class="stat-top">
+                <span class="stat-icon">▤</span>
+                <span class="stat-label">Total Transactions</span>
+            </div>
+            <strong>{{ total_transactions|default(0) }}</strong>
+            <p>Transactions analyzed by the system</p>
+        </article>
+
+        <article class="admin-stat-card stat-fraud">
+            <div class="stat-top">
+                <span class="stat-icon">!</span>
+                <span class="stat-label">Potential Fraud</span>
+            </div>
+            <strong>{{ fraud_count|default(0) }}</strong>
+            <p>Transactions flagged for review</p>
+        </article>
+
+        <article class="admin-stat-card stat-genuine">
+            <div class="stat-top">
+                <span class="stat-icon">✓</span>
+                <span class="stat-label">Likely Genuine</span>
+            </div>
+            <strong>{{ legitimate_count|default(0) }}</strong>
+            <p>Transactions classified as likely genuine</p>
+        </article>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="admin-quick-actions">
+        
+        <a href="{{ url_for('history_page') }}" class="quick-action">
+            <span class="quick-action-icon">▤</span>
+            <span>
+                <strong>Transaction History</strong>
+                <small>Review recorded transactions</small>
+            </span>
+            <span class="quick-arrow">→</span>
+        </a>
+
+        <a href="{{ url_for('model_performance_page') }}" class="quick-action">
+            <span class="quick-action-icon">⌁</span>
+            <span>
+                <strong>Model Performance</strong>
+                <small>View model evaluation metrics</small>
+            </span>
+            <span class="quick-arrow">→</span>
+        </a>
+    </div>
+
+    <!-- Analytics Charts -->
+    <div class="analytics-heading">
+        <div>
+            <p class="eyebrow">DATA & INSIGHTS</p>
+            <h2>Fraud Analytics</h2>
+            <p>Visual overview of transaction predictions and risk patterns.</p>
+        </div>
+    </div>
+
+    <div class="analytics-grid">
+
+        <!-- Fraud vs Genuine -->
+        <article class="admin-content-card chart-card">
+            <div class="chart-card-heading">
+                <div>
+                    <h3>Transaction Classification</h3>
+                    <p>Potential fraud compared with likely genuine transactions</p>
+                </div>
+                <span class="chart-symbol">◔</span>
+            </div>
+            <div class="chart-container chart-doughnut">
+                <canvas id="classificationChart"
+                        aria-label="Transaction classification chart"></canvas>
+            </div>
+            <div class="chart-footnote">
+                <span><i class="legend-dot fraud-dot"></i> Potential Fraud</span>
+                <span><i class="legend-dot genuine-dot"></i> Likely Genuine</span>
+            </div>
+        </article>
+
+        <!-- Transaction Activity -->
+        <article class="admin-content-card chart-card">
+            <div class="chart-card-heading">
+                <div>
+                    <h3>Recent Transaction Activity</h3>
+                    <p>Fraud probability for the transactions listed below</p>
+                </div>
+                <span class="chart-symbol">↗</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="activityChart"
+                        aria-label="Recent transaction risk chart"></canvas>
+            </div>
+            <p class="chart-note">
+                This chart uses the recent transactions provided by the server, not a forecast.
+            </p>
+        </article>
+
+        <!-- Transaction Types -->
+        <article class="admin-content-card chart-card">
+            <div class="chart-card-heading">
+                <div>
+                    <h3>Transaction Types</h3>
+                    <p>Breakdown of the displayed recent transactions</p>
+                </div>
+                <span class="chart-symbol">▥</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="transactionTypeChart"
+                        aria-label="Transaction type chart"></canvas>
+            </div>
+        </article>
+
+        <!-- Risk Overview -->
+        <article class="admin-content-card risk-overview-card">
+            <div class="chart-card-heading">
+                <div>
+                    <h3>Risk Overview</h3>
+                    <p>Summary of recorded prediction outcomes</p>
+                </div>
+                <span class="chart-symbol">⌖</span>
+            </div>
+
+            {% set total_count = total_transactions|default(0)|int %}
+            {% set fraud_total = fraud_count|default(0)|int %}
+            {% set genuine_total = legitimate_count|default(0)|int %}
+
+            <div class="risk-summary">
+                <div class="risk-summary-row">
+                    <div>
+                        <span class="risk-indicator risk-high"></span>
+                        <span>Potential Fraud</span>
+                    </div>
+                    <strong>{{ fraud_total }}</strong>
+                </div>
+                <div class="risk-track">
+                    <span class="risk-fill risk-fill-fraud"
+                          style="width: {{ (fraud_total * 100 / total_count) if total_count > 0 else 0 }}%"></span>
+                </div>
+
+                <div class="risk-summary-row">
+                    <div>
+                        <span class="risk-indicator risk-low"></span>
+                        <span>Likely Genuine</span>
+                    </div>
+                    <strong>{{ genuine_total }}</strong>
+                </div>
+                <div class="risk-track">
+                    <span class="risk-fill risk-fill-genuine"
+                          style="width: {{ (genuine_total * 100 / total_count) if total_count > 0 else 0 }}%"></span>
+                </div>
+
+                <div class="risk-summary-row">
+                    <div>
+                        <span class="risk-indicator risk-neutral"></span>
+                        <span>Transactions Recorded</span>
+                    </div>
+                    <strong>{{ total_count }}</strong>
+                </div>
+            </div>
+
+            <div class="risk-disclaimer">
+                <strong>Important:</strong> A fraud prediction is a model estimate, not proof of fraud.
+                Review flagged transactions before taking action.
+            </div>
+        </article>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="admin-content-card transactions-card">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">MONITORING</p>
+                <h2>Recent Transactions</h2>
+                <p>Latest transaction records supplied by SecurePay.</p>
+            </div>
+            <a href="{{ url_for('history_page') }}" class="secondary-button">
+                View Full History →
+            </a>
+        </div>
+
+        <div class="admin-table-toolbar">
+            <label for="adminTransactionSearch">Search transactions</label>
+            <input type="search"
+                   id="adminTransactionSearch"
+                   placeholder="Search ID, type, or result...">
+        </div>
+
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Amount</th>
+                        <th>Type</th>
+                        <th>Fraud Probability</th>
+                        <th>Result</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="adminTransactionBody">
+                    {% for transaction in recent_transactions|default([]) %}
+                    {% set tx_result = transaction.prediction|default(transaction.result|default('Unknown')) %}
+                    {% set tx_probability = transaction.fraud_probability|default(transaction.risk_score|default(transaction.probability|default(0))) %}
+                    {% set tx_type = transaction.transaction_type|default(transaction.type|default('N/A')) %}
+                    {% set tx_id = transaction.id|default(transaction.transaction_id|default('N/A')) %}
+                    {% set tx_is_fraud = 'fraud' in tx_result|string|lower or 'potential' in tx_result|string|lower %}
+
+                    <tr class="admin-transaction-row">
+                        <td class="transaction-id">#{{ tx_id }}</td>
+                        <td class="transaction-amount">
+                            ₹{{ "%.2f"|format(transaction.amount|default(0)|float) }}
+                        </td>
+                        <td>{{ tx_type }}</td>
+                        <td>
+                            {% set probability_value = tx_probability|float %}
+                            {% set probability_percent = probability_value * 100 if probability_value <= 1 else probability_value %}
+                            <div class="probability-cell">
+                                <span>{{ "%.2f"|format(probability_percent) }}%</span>
+                                <div class="probability-track">
+                                    <span class="{{ 'probability-high' if tx_is_fraud else 'probability-low' }}"
+                                          style="width: {{ [[probability_percent, 0]|max, 100]|min }}%"></span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge {{ 'status-fraud' if tx_is_fraud else 'status-genuine' }}">
+                                {{ tx_result }}
+                            </span>
+                        </td>
+                        <td class="transaction-date">
+                            {{ transaction.created_at|default(transaction.timestamp|default('N/A')) }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            No transactions have been recorded yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p id="adminNoSearchResults" class="empty-state" hidden>
+            No transactions match your search.
+        </p>
+    </div>
+
+    <!-- Model Information -->
+    <div class="admin-content-card model-information-card">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">MODEL STATUS</p>
+                <h2>Fraud Detection Model</h2>
+                <p>Information about the model currently used by SecurePay.</p>
+            </div>
+            <span class="model-status"><span class="live-dot"></span> Loaded</span>
+        </div>
+
+        <div class="model-information-grid">
+            <div class="model-info-item">
+                <span>Algorithm</span>
+                <strong>{{ model_name|default('XGBoost') }}</strong>
+            </div>
+            <div class="model-info-item">
+                <span>System Purpose</span>
+                <strong>Transaction Risk Assessment</strong>
+            </div>
+            <div class="model-info-item">
+                <span>Prediction Type</span>
+                <strong>Fraud Probability Classification</strong>
+            </div>
+        </div>
+
+        <div class="model-action">
+            <p>Review available evaluation metrics to understand the model's performance.</p>
+            <a href="{{ url_for('model_performance_page') }}" class="primary-button">
+                View Model Performance →
+            </a>
+        </div>
+    </div>
+
+    <p class="admin-footer-note">
+        SecurePay Admin Center · Predictions are estimates and should be reviewed responsibly.
+    </p>
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const fraudCount = Number({{ fraud_count|default(0)|tojson }}) || 0;
+    const genuineCount = Number({{ legitimate_count|default(0)|tojson }}) || 0;
+
+    const recentLabels = [
+        {% for transaction in recent_transactions|default([]) %}
+            {{ ("#" ~ (transaction.id|default(transaction.transaction_id|default(loop.index))))|tojson }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const recentProbabilities = [
+        {% for transaction in recent_transactions|default([]) %}
+            {% set raw_probability = transaction.fraud_probability|default(transaction.risk_score|default(transaction.probability|default(0)))|float %}
+            {{ (raw_probability * 100 if raw_probability <= 1 else raw_probability)|round(2) }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const recentTypes = [
+        {% for transaction in recent_transactions|default([]) %}
+            {{ (transaction.transaction_type|default(transaction.type|default('Unknown')))|string|upper|tojson }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    function createChart(canvasId, config) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas || typeof Chart === "undefined") return;
+        new Chart(canvas, config);
+    }
+
+    Chart.defaults.font.family = "Inter, Segoe UI, Arial, sans-serif";
+    Chart.defaults.color = "#7b8499";
+
+    createChart("classificationChart", {
+        type: "doughnut",
+        data: {
+            labels: ["Potential Fraud", "Likely Genuine"],
+            datasets: [{
+                data: [fraudCount, genuineCount],
+                backgroundColor: ["#e45d70", "#36b889"],
+                borderColor: ["#ffffff", "#ffffff"],
+                borderWidth: 4,
+                hoverOffset: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "70%",
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return " " + context.label + ": " + context.parsed;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    createChart("activityChart", {
+        type: "line",
+        data: {
+            labels: recentLabels,
+            datasets: [{
+                label: "Fraud Probability",
+                data: recentProbabilities,
+                borderColor: "#635bdf",
+                backgroundColor: "rgba(99, 91, 223, 0.12)",
+                fill: true,
+                tension: 0.35,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: "#635bdf"
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function (value) { return value + "%"; }
+                    },
+                    grid: { color: "#edf0f6" }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { maxRotation: 0, autoSkip: true }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return " Fraud probability: " + context.parsed.y + "%";
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    const typeCounts = {};
+    recentTypes.forEach(function (type) {
+        typeCounts[type] = (typeCounts[type] || 0) + 1;
+    });
+
+    createChart("transactionTypeChart", {
+        type: "bar",
+        data: {
+            labels: Object.keys(typeCounts),
+            datasets: [{
+                label: "Transactions",
+                data: Object.values(typeCounts),
+                backgroundColor: "#7770e8",
+                borderRadius: 7,
+                maxBarThickness: 42
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 },
+                    grid: { color: "#edf0f6" }
+                },
+                x: { grid: { display: false } }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    const searchInput = document.getElementById("adminTransactionSearch");
+    const transactionRows = Array.from(
+        document.querySelectorAll(".admin-transaction-row")
+    );
+    const noResults = document.getElementById("adminNoSearchResults");
+
+    if (searchInput) {
+        searchInput.addEventListener("input", function () {
+            const term = searchInput.value.trim().toLowerCase();
+            let visible = 0;
+
+            transactionRows.forEach(function (row) {
+                const matches = row.textContent.toLowerCase().includes(term);
+                row.hidden = !matches;
+                if (matches) visible++;
+            });
+
+            if (noResults) {
+                noResults.hidden = visible !== 0 || term === "";
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

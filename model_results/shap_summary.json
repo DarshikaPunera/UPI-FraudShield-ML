@@ -1,0 +1,9 @@
+{
+    "method": "SHAP TreeExplainer",
+    "model": "XGBoost",
+    "sample_size": 1000,
+    "feature_count": 11,
+    "importance_file": "shap_feature_importance.csv",
+    "individual_explanations_file": "shap_sample_explanations.csv",
+    "interpretation": "Positive SHAP values generally push the model toward the fraud class; negative values push it toward the genuine class."
+}

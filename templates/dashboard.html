@@ -1,0 +1,249 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard | SecurePay{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="dashboard-container">
+
+        <!-- Welcome Section -->
+        <div class="dashboard-welcome">
+            <div>
+                <span class="dashboard-eyebrow">SECUREPAY INTELLIGENCE</span>
+                <h1>Welcome, {{ logged_in_user.username|default('User') }}!</h1>
+                <p>Monitor transaction activity and analyze potential fraud risks.</p>
+            </div>
+
+            <a href="{{ url_for('predict_page') }}" class="dashboard-primary-btn">
+                + Analyze Transaction
+            </a>
+        </div>
+
+        <!-- Dashboard Statistics -->
+        <div class="dashboard-stat-grid">
+
+            <div class="dashboard-stat-card">
+                <div class="stat-top">
+                    <span class="stat-icon stat-blue">↗</span>
+                    <span class="stat-label">Total Transactions</span>
+                </div>
+                <h2>{{ total_transactions|default(0) }}</h2>
+                <p>Transactions analyzed</p>
+            </div>
+
+            <div class="dashboard-stat-card">
+                <div class="stat-top">
+                    <span class="stat-icon stat-red">!</span>
+                    <span class="stat-label">Potential Fraud</span>
+                </div>
+                <h2>{{ fraud_count|default(0) }}</h2>
+                <p>Transactions flagged for review</p>
+            </div>
+
+            <div class="dashboard-stat-card">
+                <div class="stat-top">
+                    <span class="stat-icon stat-green">✓</span>
+                    <span class="stat-label">Likely Genuine</span>
+                </div>
+                <h2>{{ legitimate_count|default(0) }}</h2>
+                <p>Transactions below the fraud threshold</p>
+            </div>
+
+            <div class="dashboard-stat-card">
+                <div class="stat-top">
+                    <span class="stat-icon stat-purple">%</span>
+                    <span class="stat-label">Fraud Rate</span>
+                </div>
+                <h2>{{ "%.2f"|format(fraud_rate|default(0)|float) }}%</h2>
+                <p>Share of flagged transactions</p>
+            </div>
+
+        </div>
+
+        <!-- Main Dashboard Panels -->
+        <div class="dashboard-main-grid">
+
+            <!-- Analyze Transaction Panel -->
+            <div class="dashboard-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h2>Analyze Transaction</h2>
+                        <p>Check a transaction for potential fraud risk.</p>
+                    </div>
+                    <span class="panel-heading-icon">⌕</span>
+                </div>
+
+                <div class="analysis-feature">
+                    <div class="analysis-graphic">
+                        <div class="analysis-orbit orbit-one"></div>
+                        <div class="analysis-orbit orbit-two"></div>
+                        <div class="analysis-circle">AI</div>
+                    </div>
+
+                    <h3>Intelligent Fraud Analysis</h3>
+                    <p>
+                        Enter transaction details and use the trained
+                        XGBoost model to estimate potential fraud risk.
+                    </p>
+
+                    <a href="{{ url_for('predict_page') }}"
+                       class="dashboard-primary-btn full-width">
+                        Start Analysis →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Actions Panel -->
+            <div class="dashboard-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h2>Quick Actions</h2>
+                        <p>Access your SecurePay tools.</p>
+                    </div>
+                    <span class="panel-heading-icon">☷</span>
+                </div>
+
+                <div class="quick-actions">
+
+                    <a href="{{ url_for('history_page') }}" class="quick-action">
+                        <span class="quick-action-icon action-blue">▤</span>
+                        <span>
+                            <strong>Transaction History</strong>
+                            <small>Review previously analyzed transactions</small>
+                        </span>
+                        <span class="action-arrow">›</span>
+                    </a>
+
+                    {% if logged_in_user.role|default('user') == 'admin' %}
+                    <a href="{{ url_for('model_performance_page') }}"
+                       class="quick-action">
+                        <span class="quick-action-icon action-purple">▥</span>
+                        <span>
+                            <strong>Model Performance</strong>
+                            <small>Review trained model evaluation metrics</small>
+                        </span>
+                        <span class="action-arrow">›</span>
+                    </a>
+                    {% endif %}
+
+                    <a href="{{ url_for('predict_page') }}" class="quick-action">
+                        <span class="quick-action-icon action-green">✓</span>
+                        <span>
+                            <strong>New Analysis</strong>
+                            <small>Analyze another transaction</small>
+                        </span>
+                        <span class="action-arrow">›</span>
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="dashboard-panel recent-transactions">
+
+            <div class="panel-heading recent-heading">
+                <div>
+                    <h2>Recent Transactions</h2>
+                    <p>Your latest transaction analysis records.</p>
+                </div>
+
+                <a href="{{ url_for('history_page') }}" class="dashboard-text-link">
+                    View All →
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Amount</th>
+                            <th>Type</th>
+                            <th>Fraud Probability</th>
+                            <th>Result</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for transaction in recent_transactions|default([]) %}
+                        {% set tx_result = transaction.prediction|default(transaction.result|default('Unknown')) %}
+                        {% set tx_probability = transaction.fraud_probability|default(transaction.risk_score|default(transaction.probability|default(0))) %}
+
+                        <tr>
+                            <td>#{{ loop.index }}</td>
+
+                            <td>
+                                ₹{{ "%.2f"|format(transaction.amount|default(0)|float) }}
+                            </td>
+
+                            <td>
+                                {{ transaction.transaction_type|default(transaction.type|default('N/A')) }}
+                            </td>
+
+                            <td>
+                                {% if tx_probability|float <= 1 %}
+                                    {{ "%.2f"|format(tx_probability|float * 100) }}%
+                                {% else %}
+                                    {{ "%.2f"|format(tx_probability|float) }}%
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if 'fraud' in tx_result|string|lower or 'potential' in tx_result|string|lower %}
+                                    <span class="status-pill status-fraud">
+                                        {{ tx_result }}
+                                    </span>
+                                {% elif 'genuine' in tx_result|string|lower or 'legitimate' in tx_result|string|lower %}
+                                    <span class="status-pill status-legitimate">
+                                        {{ tx_result }}
+                                    </span>
+                                {% else %}
+                                    <span class="status-pill status-unknown">
+                                        {{ tx_result }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ transaction.created_at|default(transaction.timestamp|default('N/A')) }}
+                            </td>
+                        </tr>
+
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="empty-table">
+                                <div class="empty-state-icon">▤</div>
+                                <strong>No transactions yet</strong>
+                                <p>Your analyzed transactions will appear here.</p>
+                                <a href="{{ url_for('predict_page') }}">
+                                    Analyze your first transaction →
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Educational Disclaimer -->
+        <div class="dashboard-disclaimer">
+            <span>ⓘ</span>
+            <p>
+                <strong>Educational prototype:</strong>
+                Fraud predictions are model estimates, not confirmed fraud.
+                Review flagged transactions before making decisions.
+            </p>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

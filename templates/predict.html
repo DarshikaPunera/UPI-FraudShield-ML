@@ -1,0 +1,111 @@
+
+{% extends "base.html" %}
+
+{% block title %}Fraud Detection | SecurePay{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/predict.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="predict-page">
+    <div class="page-heading">
+        <p class="eyebrow">SECUREPAY INTELLIGENCE</p>
+        <h1>Transaction Fraud Detection</h1>
+        <p>Enter transaction details to analyze its potential fraud risk using the trained XGBoost model.</p>
+    </div>
+
+    <div class="predict-card">
+        <form id="predictionForm" method="POST" action="{{ url_for('predict_page') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="amount">Transaction Amount</label>
+                    <input type="number" id="amount" name="amount"
+                           min="0.01" step="any" required
+                           placeholder="e.g. 5000">
+                </div>
+
+                <div class="form-group">
+                    <label for="transaction_type">Transaction Type</label>
+                    <select id="transaction_type" name="transaction_type" required>
+                        <option value="">Select transaction type</option>
+                        <option value="CASH_IN">Cash In</option>
+                        <option value="CASH_OUT">Cash Out</option>
+                        <option value="DEBIT">Debit</option>
+                        <option value="PAYMENT">Payment</option>
+                        <option value="TRANSFER">Transfer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="step">Transaction Step</label>
+                    <input type="number" id="step" name="step"
+                           min="1" step="1" required
+                           placeholder="e.g. 100">
+                    <small>Enter the transaction time step used by the dataset.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="oldbalanceOrg">Sender's Previous Balance</label>
+                    <input type="number" id="oldbalanceOrg" name="oldbalanceOrg"
+                           min="0" step="any" required placeholder="e.g. 10000">
+                </div>
+
+                <div class="form-group">
+                    <label for="newbalanceOrig">Sender's New Balance</label>
+                    <input type="number" id="newbalanceOrig" name="newbalanceOrig"
+                           min="0" step="any" required placeholder="e.g. 5000">
+                </div>
+
+                <div class="form-group">
+                    <label for="oldbalanceDest">Receiver's Previous Balance</label>
+                    <input type="number" id="oldbalanceDest" name="oldbalanceDest"
+                           min="0" step="any" required placeholder="e.g. 2000">
+                </div>
+
+                <div class="form-group">
+                    <label for="newbalanceDest">Receiver's New Balance</label>
+                    <input type="number" id="newbalanceDest" name="newbalanceDest"
+                           min="0" step="any" required placeholder="e.g. 7000">
+                </div>
+            </div>
+
+            <button type="submit" id="predictButton" class="predict-button">
+                Analyze Transaction
+            </button>
+        </form>
+    </div>
+
+    {% if prediction is defined and prediction %}
+    <div class="prediction-result">
+        <h2>Analysis Result</h2>
+        <p class="result-status">{{ prediction }}</p>
+
+        
+{% if probability is defined %}
+<p>Fraud probability: <strong>{{ "%.2f"|format(probability|float) }}%</strong></p>
+{% elif fraud_probability is defined %}
+<p>Fraud probability: <strong>{{ "%.2f"|format(fraud_probability|float) }}%</strong></p>
+{% endif %}
+
+        {% if transaction_id is defined and transaction_id %}
+        <p>Transaction ID: <strong>{{ transaction_id }}</strong></p>
+        {% endif %}
+
+        {% if result_message is defined and result_message %}
+        <p>{{ result_message }}</p>
+        {% endif %}
+
+        <p class="result-disclaimer">
+            This result is a model-based risk assessment, not a guarantee that a transaction is fraudulent.
+        </p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/predict.js') }}"></script>
+{% endblock %}
