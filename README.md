@@ -1,2 +1,2 @@
-# UPI_SYSTEM_CURRENT
+# UPI-FraudShield-ML
 ML-Based UPI Fraud Detection System using XGBOOST
